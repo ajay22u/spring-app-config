@@ -1,0 +1,95 @@
+package string;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+//I used Intellij to build and run this text editors, change the file path as per your wish, use the below command to perform the different operations like seve, delete, nsert text etc.
+//Enter a command: (p)rint, (i)nsert, (d)elete, (s)ave, (q)uit")Enter a command: (p)rint, (i)nsert, (d)elete, (s)ave, (q)uit")
+public class LineTextEditor {
+    private List<String> lines;
+    private static String filename = "D:/MyTextFile.txt";
+
+    public LineTextEditor(String filename) {
+        this.filename = filename;
+        this.lines = new ArrayList<>();
+    }
+
+    public void loadFile() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+    }
+
+    public void saveFile() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
+            }
+        }
+    }
+    public void printLines() {
+        for (int i = 0; i < lines.size(); i++) {
+            System.out.println((i + 1) + ": " + lines.get(i));
+        }
+    }
+
+    public void insertLine(int lineNumber, String text) {
+        lines.add(lineNumber - 1, text);
+    }
+
+    public void deleteLine(int lineNumber) {
+        lines.remove(lineNumber - 1);
+    }
+
+    public void edit() throws IOException {
+        BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+        String command;
+
+        while (true) {
+            System.out.println("\nEnter a command: (p)rint, (i)nsert, (d)elete, (s)ave, (q)uit");
+            command = inputReader.readLine().trim().toLowerCase();
+
+            switch (command) {
+                case "p":
+                    printLines();
+                    break;
+                case "i":
+                    System.out.print("Enter line number to insert: ");
+                    int insertLineNum = Integer.parseInt(inputReader.readLine().trim());
+                    System.out.print("Enter text to insert: ");
+                    String insertText = inputReader.readLine();
+                    insertLine(insertLineNum, insertText);
+                    break;
+                case "d":
+                    System.out.print("Enter line number to delete: ");
+                    int deleteLineNum = Integer.parseInt(inputReader.readLine().trim());
+                    deleteLine(deleteLineNum);
+                    break;
+                case "s":
+                    saveFile();
+                    System.out.println("File saved.");
+                    break;
+                case "q":
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid command. Please try again.");
+            }
+        }
+    }
+    public static void main(String[] args) throws FileNotFoundException {
+        File file = new File("D:/MyTextFile.txt");
+        LineTextEditor editor = new LineTextEditor(file.toString());
+        try {
+            editor.loadFile();
+            editor.edit();
+        } catch (IOException e) {
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+}
